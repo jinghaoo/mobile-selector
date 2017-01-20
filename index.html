@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <title>选择器</title>
+</head>
+<style>
+body{margin:0;font-family:Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;background:#eee;}
+</style>
+<body>
+<div style="margin-top:10px;">
+    <span style="padding-right:10px;">年份</span>
+    <input style="border:solid 1px red;" class="qu-year" type="text">
+</div>
+<div style="margin-top:10px;">
+    <span style="padding-right:10px;">身高</span>
+    <input style="border:solid 1px red;" class="qu-height" type="text">
+</div>
+<div style="margin-top:10px;">
+    <span style="padding-right:10px;">体重</span>
+    <input style="border:solid 1px red;" class="qu-weight" type="text">
+</div>
+<div style="margin-top:10px;">
+    <span style="padding-right:10px;">睡眠</span>
+    <input style="border:solid 1px red;" class="qu-time" type="text">
+</div>
+<div style="margin-top:10px;">
+    <span style="padding-right:10px;">年月日+时间</span>
+    <input style="border:solid 1px red;margin-top:10px" class="sp-date" type="text">
+</div>
+<div style="margin-top:10px;">
+    <span style="padding-right:10px;">年月日</span>
+    <input style="border:solid 1px red;margin-top:10px" class="sp-time" type="text">
+</div>
+<!-- <script src="js/jq.js"></script> -->
+<script src="js/zepto.js"></script>
+<script src="js/jquery.selector.js"></script>
+<script>
+$(function(){
+    // ---------【数据部分开始】---------
+    // 出生年份计算，当前年份-(当前年份-100)
+    var nowYear = new Date().getFullYear();
+    var gYear = [];
+    for(var i=0;i<100;i++){
+        gYear.push(Number(nowYear)-i);
+    };
+    // 身高范围，50-220
+    var quHeight = [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220];
+    // 体重范围，20-220(整数)，0-9(小数)
+    // 整数
+    var quWeightInt = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220];
+    // 小数
+    var quWeightFl = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    // 时长数据
+    // 小时
+    var spoHour = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+    // 分钟
+    var spoMinute = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59"];
+    // ---------【数据部分结束】---------
+    // 年份
+    $.scrEvent({
+        data: gYear,
+        evEle: '.qu-year',
+        title: '出生年份',
+        defValue: 1980,
+        afterAction: function(data){
+            alert(data)
+        }
+    });
+
+    // 身高
+    $.scrEvent({
+        data: quHeight,
+        evEle: '.qu-height',
+        title: '身高/cm',
+        defValue: 170,
+        afterAction: function(data){
+            alert(data)
+        }
+    });
+
+    //体重
+    $.scrEvent2({
+        data1: quWeightInt,
+        data2: quWeightFl,
+        evEle: '.qu-weight',
+        title: '体重/kg',
+        defValue: 60,
+        defValue2: 0,
+        linkType: '.',
+        afterAction: function(data1, data2){
+            $('.qu-time').attr('h', data1);
+            $('.qu-time').attr('m', data2);
+            alert('你选择的是：'+data1+ '.' +data2);
+        }
+    })
+
+    
+    //睡眠
+    $.scrEvent2({
+        data1: spoHour,
+        data2: spoMinute,
+        evEle: '.qu-time',
+        title: '睡眠时长',
+        defValue: 6,
+        defValue2: 0,
+        eleName: '小时',
+        eleName2: '分钟',
+        linkType: ':',
+        afterAction: function(data1, data2){
+            $('.qu-time').attr('h', data1);
+            $('.qu-time').attr('m', data2);
+            alert('你选择的是：'+data1+ '小时,' +data2 +'分钟');
+        },
+        beforeVal1:function (){
+          return $('.qu-time').attr('h');
+        },
+        beforeVal2:function (){
+          return $('.qu-time').attr('m');
+        }
+    })
+
+    // 年月日 时分
+    $.dateSelector({
+        evEle:'.sp-date',
+        linkType: '-',
+        year: 1990,
+        month: 12,
+        day: 08,
+        linkType: '-',
+        startYear: '2017',
+        endYear: '2017',
+        timeBoo: true,
+        afterAction: function(d1,d2,d3,d4,d5){
+          console.log(d1,d2,d3);
+          alert('你选择的是：'+d1+ '-' +d2 +'-'+ d3+'  '+d4+':'+d5);
+        }
+    });
+    
+    // 年月日
+    $.dateSelector({
+        evEle:'.sp-time',
+        linkType: '-',
+        startYear: '2017',
+        endYear: '2017',
+        timeBoo: false,
+        afterAction: function(d1,d2,d3){
+          console.log(d1,d2,d3)
+
+          alert('你选择的是：'+d1+ '-' +d2 +'-'+ d3);
+        }
+    });
+
+    
+});
+</script>
+</body>
+</html>
