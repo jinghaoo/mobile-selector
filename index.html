@@ -33,7 +33,7 @@ body{margin:0;font-family:Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif
     <span style="padding-right:10px;">年月日</span>
     <input style="border:solid 1px red;margin-top:10px" class="sp-time" type="text">
 </div>
-<!-- <script src="js/jq.js"></script> -->
+
 <script src="js/zepto.js"></script>
 <script src="js/jquery.selector.js"></script>
 <script>
@@ -65,7 +65,8 @@ $(function(){
         title: '出生年份',
         defValue: 1980,
         afterAction: function(data){
-            alert(data)
+            
+            $(".qu-year").val(data);
         }
     });
 
@@ -76,7 +77,8 @@ $(function(){
         title: '身高/cm',
         defValue: 170,
         afterAction: function(data){
-            alert(data)
+
+            $('.qu-height').val(data);
         }
     });
 
@@ -90,9 +92,8 @@ $(function(){
         defValue2: 0,
         linkType: '.',
         afterAction: function(data1, data2){
-            $('.qu-time').attr('h', data1);
-            $('.qu-time').attr('m', data2);
-            alert('你选择的是：'+data1+ '.' +data2);
+
+            $('.qu-weight').val(data1 +'.'+ data2);
         }
     })
 
@@ -111,7 +112,7 @@ $(function(){
         afterAction: function(data1, data2){
             $('.qu-time').attr('h', data1);
             $('.qu-time').attr('m', data2);
-            alert('你选择的是：'+data1+ '小时,' +data2 +'分钟');
+            $('.qu-time').val(data1+ '小时' +data2 +'分钟');
         },
         beforeVal1:function (){
           return $('.qu-time').attr('h');
@@ -133,8 +134,7 @@ $(function(){
         endYear: '2017',
         timeBoo: true,
         afterAction: function(d1,d2,d3,d4,d5){
-          console.log(d1,d2,d3);
-          alert('你选择的是：'+d1+ '-' +d2 +'-'+ d3+'  '+d4+':'+d5);
+          $('.sp-date').val(d1 + '-' + d2 + '-' + d3 + '  ' + d4 + ':' + d5); 
         }
     });
     
@@ -151,8 +151,6 @@ $(function(){
           alert('你选择的是：'+d1+ '-' +d2 +'-'+ d3);
         }
     });
-
-    
 });
 </script>
 </body>

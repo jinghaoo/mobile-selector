@@ -41,7 +41,7 @@
 
     // 取消选择
     $('.sel-box .cancel,.sel-boxs .bg').click(function(){
-        //$('.sel-boxs').hide();
+    
         $('body').css('overflow','auto');
         $('.sel-boxs .bg')[0].removeEventListener('touchmove', preDef, false);
         $('.sel-boxs .btn')[0].removeEventListener('touchmove', preDef, false);
@@ -481,7 +481,6 @@
             // 进行传值
             $('.sel-box .ok').click(function(){
                 afterAction(scText,scText2,scText3,scText4,scText5);
-                //$('.sel-boxs').hide();
 
                 $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
                 setTimeout(function(){
