@@ -51,7 +51,9 @@
         },300);
     });
 
-    
+    $(".sel-con").on("touchend", function (event) {
+        event.preventDefault();
+    });
     //取消默认行为
     var preDef = function(e){
         e.preventDefault();
