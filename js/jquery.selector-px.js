@@ -1,5 +1,5 @@
 ;(function($){
-    
+
     //如果有元素移除
     $('.sel-boxs').remove();
     $('body').append('<style>'+
@@ -43,7 +43,6 @@
     // 取消选择
     $('.sel-box .cancel,.sel-boxs .bg').click(function(){
     
-        $('body').css('overflow','auto');
         $('.sel-boxs .bg')[0].removeEventListener('touchmove', preDef, false);
         $('.sel-boxs .btn')[0].removeEventListener('touchmove', preDef, false);
         $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
@@ -52,10 +51,12 @@
         },300);
     });
 
+    //取消ios在zepto下的穿透事件
     $(".sel-con").on("touchend", function (event) {
         event.preventDefault();
     });
-    //取消默认行为
+
+    //取消默认行为   灰层底部不能滑动
     var preDef = function(e){
         e.preventDefault();
         return false;
@@ -72,11 +73,6 @@
     // 封装说明：
     // 基于jQuery
     // 适合场景，只适用于单个值的选取模式
-    // scrEvent(ele,evEle,selName,defValue)
-    // 1.参数【ele】是选择器取值范围，类型为数组
-    // 2.参数【evEle】是要绑定元素的元素名称，如：class、id、element...
-    // 3.参数【selName】是选择器名称
-    // 4.参数【defValue】是选择器默认值【可选】
     $.scrEvent = function(params){
 
         var dataArr = params.data || [];
@@ -84,11 +80,8 @@
         var title = params.title || '';
         var defValue = params.defValue || dataArr[0]; //首次默认值
         var type = params.type || 'click'; //事件类型
-        var beforeVal = params.beforeVal || function (){  //每次默认值
-        }
-
-        //执行后的动作   参数：选择的文字
-        var afterAction = params.afterAction || function (){};
+        var beforeAction = params.beforeAction || function(){};//执行前的动作  无参数 
+        var afterAction = params.afterAction || function (data){};//执行后的动作   参数：选择的文字
 
         $(evEle).attr('readonly','readonly');
         // 点击对应input执行事件
@@ -98,23 +91,20 @@
             $('input, textarea').each(function(){
                 this.blur();
             });
-            $('body').css('overflow','hidden');
+            
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
 
+            beforeAction();
             $('.sel-con .table').html(dataFrame(dataArr));
             $('.sel-box .name').text(title);
             $('.sel-boxs').show().find('.sel-box').removeClass('fadeInDown').addClass('fadeInUp');
             // 默认值
-            if (!beforeVal()) {
-                $(evEle).val() == "" ? defValue = defValue : defValue = $(evEle).val();
-            }else{
-                defValue = beforeVal();
-            }
+            $(evEle).val() == "" ? defValue = defValue : defValue = $(evEle).attr('data-sel01');
 
             $('.sel-con').find('.elem').eq(0).find('.ele').each(function(){
                 if($(this).text() == defValue){
-                    $(this).parents('.scroll').scrollTop($(this).index()*36);
+                    $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                 }
             });
             // 选择器滚动获取值和确认赋值
@@ -122,25 +112,27 @@
             $('.sel-con .scroll').scroll(function(){
                 var that = $(this);
                 // 数值显示
-                var scTop = $(this).scrollTop()+18;
+                var scTop = $(this)[0].scrollTop+18;
                 var scNum = Math.floor(scTop/36);
                 scText = $(this).find('.ele').eq(scNum).text();
                 // 停止锁定
                 clearTimeout($(this).attr('timer'));
-                $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                $(this).attr('timer',setTimeout(function(){
+                    that[0].scrollTop = scNum*36;
+                },100));
             });
 
             //移除之前的绑定事件
             $(".sel-box .ok").off();
             // 确认选择
             $('.sel-box .ok').click(function(){
+                $(evEle).attr('data-sel01', scText);
                 afterAction(scText);
-                //$('.sel-boxs').hide();
                 $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
                 setTimeout(function(){
                   $('.sel-boxs').hide();
                 },300);
-                $('body').css('overflow','auto');
+                
                 $('.sel-boxs .bg')[0].removeEventListener('touchmove', preDef, false);
                 $('.sel-boxs .btn')[0].removeEventListener('touchmove', preDef, false);
             });
@@ -151,38 +143,19 @@
     // 封装说明：
     // 基于jQuery
     // 适合场景，只适用于两个值的选取模式
-    // scrEvent2(ele,evEle,selName,defValue,ele2)
-    // 1.参数【ele】是选择器取值范围，类型为数组
-    // 2.参数【evEle】是要绑定元素的元素名称，如：class、id、element...  【必须】
-    // 3.参数【selName】是选择器名称
-    // 4.参数【defValue】是选择器第一个取值默认值【可选】
-    // 5.参数【ele2】是选择器取值范围第二个值，类型为数组
-    // 6.参数【defValue2】是选择器第二个取值默认值【可选】
-    // 7.参数【linkType】是第一个值和第二个值中间链接符号
-    // 8.参数【eleName】是选择器第一个值的名称【可选】
-    // 9.参数【eleName2】是选择器第二个值的名称【可选】
     $.scrEvent2 = function(params){
 
-        var ele = params.data1 || [];
-        var ele2 = params.data2 || [];
-        var evEle = params.evEle;
-        var selName = params.title || '';
-
+        var ele = params.data || [];        //数据
+        var ele2 = params.data2 || [];      //数据
+        var evEle = params.evEle;           //触发选择器
+        var selName = params.title || '';   //标题
         var defValue = params.defValue || ele[0]; //首次默认值
         var defValue2 = params.defValue2 || ele2[0];//首次默认值
         var type = params.type || 'click'; //事件类型
         var eleName = params.eleName || '';  //第一个值的单位
         var eleName2 = params.eleName2 || '';  //第二个值的单位
-        var linkType = params.linkType || ''; //分隔符
-
-        var beforeVal1 = params.beforeVal1 || function (){  //每次默认值
-        }
-
-        var beforeVal2 = params.beforeVal2 || function (){  //每次默认值
-        }
-
-        //执行后的动作   参数1：选择的文字1； 参数2 选择的文字2 
-        var afterAction = params.afterAction || function (){};
+        var beforeAction = params.beforeAction || function(){}; //执行前的动作  无参数
+        var afterAction = params.afterAction || function (){data1, data2};//执行后的动作   参数1：选择的文字1； 参数2 选择的文字2 
 
         $(evEle).attr('readonly','readonly');
         eleName!=''?eleName = '<div class="cell" style="font-size:14px;color:#b2b2b2;">'+eleName+'</div>':eleName = '';
@@ -195,7 +168,6 @@
                 this.blur();
             });
 
-            $('body').css('overflow','hidden');
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
 
@@ -204,27 +176,18 @@
             $('.sel-boxs').show().find('.sel-box').removeClass('fadeInDown').addClass('fadeInUp');
 
             // 第一个值默认值
-            if (!beforeVal1()) {
-                $(evEle).val()==""?defValue = defValue:defValue=$(evEle).val().split(linkType)[0];
-            }else{
-                 defValue = beforeVal1();
-            }
-
-            if (!beforeVal2()) {
-                $(evEle).val()==""?defValue2 = defValue2:defValue2=$(evEle).val().split(linkType)[1];
-            }else{
-                defValue2 = beforeVal2();
-            }
+            $(evEle).val()==""?defValue = defValue:defValue= $(evEle).attr('data-sel01');
+            $(evEle).val()==""?defValue2 = defValue2:defValue2=$(evEle).attr('data-sel02');
 
             $('.sel-con').find('.elem').eq(0).find('.ele').each(function(){
                 if($(this).text()==defValue){
-                    $(this).parents('.scroll').scrollTop($(this).index()*36);
+                    $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                 }
             });
             // 第二个值默认值
             $('.sel-con').find('.elem').eq(1).find('.ele').each(function(){
                 if($(this).text()==defValue2){
-                    $(this).parents('.scroll').scrollTop($(this).index()*36);
+                    $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                 }
             });
             // 选择器滚动获取值和确认赋值
@@ -233,7 +196,7 @@
             $('.sel-con .scroll').scroll(function(){
                 var that = $(this);
                 // 数值显示
-                var scTop = $(this).scrollTop()+18;
+                var scTop = $(this)[0].scrollTop+18;
                 var scNum = Math.floor(scTop/36);
                 if($(this).parents('.elem').index()==0){
                     scText = $(this).find('.ele').eq(scNum).text();
@@ -242,26 +205,36 @@
                 };
                 // 停止锁定
                 clearTimeout($(this).attr('timer'));
-                $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                $(this).attr('timer',setTimeout(function(){
+                    that[0].scrollTop = scNum*36;
+                },100));
             });
 
             //移除之前的绑定事件
             $(".sel-box .ok").off();
             // 确认选择
             $('.sel-box .ok').click(function(){
+                $(evEle).attr('data-sel01', scText);
+                $(evEle).attr('data-sel02', scText2);
                 afterAction(scText, scText2);
-                //$('.sel-boxs').hide();
+
                 $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
                 setTimeout(function(){
                   $('.sel-boxs').hide();
                 },300);
-                $('body').css('overflow','auto');
+                
                 $('.sel-boxs .bg')[0].removeEventListener('touchmove', preDef, false);
                 $('.sel-boxs .btn')[0].removeEventListener('touchmove', preDef, false);
             });   
         });
     };
 
+  
+    // 选择器
+    // 封装说明：
+    // 基于jQuery
+    // 适合场景，适用于年 月 日选择 小时 分钟
+    
     // 每个月的天数
     function getMonthDays(year,month){
         return new Date(year,month,0).getDate();
@@ -278,19 +251,7 @@
         };
         return arrDay;
     };
-
-    // 选择器
-    // 封装说明：
-    // 基于jQuery
-    // 适合场景，适用于年 月 日选择
-    // dateSelector(evEle,year,month,day)
-    // 1.参数【evEle】是要绑定元素的元素名称，如：class、id、element...
-    // 2.参数【year】默认显示年，没有需设置为空
-    // 3.参数【month】默认显示月，没有需设置为空
-    // 4.参数【day】默认显示日，没有需设置为空
-    // 5.参数【timeBoo】true:使用年月日+时间 false:使用年月日
-    // 6.参数【hour】默认显示小时
-    // 7.参数【minute】默认显示分钟
+    
     $.dateSelector = function(params){
         var hunYear = [];
         var evEle = params.evEle || evEle;
@@ -298,12 +259,12 @@
         var month = params.month || new Date().getMonth() + 1;
         var day = params.day || new Date().getDate();
         var type = params.type || 'click'; //事件类型
-        var linkType = params.linkType || '-';
         var startYear = params.startYear || '';
         var endYear = params.endYear || '';
         var timeBoo = params.timeBoo || false;
         var hour = params.hour || new Date().getHours();
         var minute = params.minute || new Date().getMinutes();
+        var title = params.title || '日期选择';
         //执行后的动作   参数：选择的文字
         var afterAction = params.afterAction || function (){};
 
@@ -332,7 +293,6 @@
         // 年月日选择器
         $(evEle).on(type, function(){
 
-            $('body').css('overflow','hidden');
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
 
@@ -341,17 +301,16 @@
                 timeGroup=dataFrame(timeHour)+dataFrame(timeMinute);
             };
             $('.sel-con .table').html(dataFrame(hunYear)+dataFrame(tweMonth)+dataFrame(couDay(getMonthDays(hunYear[0],tweMonth[0])))+timeGroup);
-            $('.sel-box .name').text("日期选择");
+            $('.sel-box .name').text(title);
             $('.sel-boxs').show().find('.sel-box').removeClass('fadeInDown').addClass('fadeInUp');
             // 选择器
             if($(evEle).val()!=''){
-                year = $(evEle).val().split(linkType)[0]
-                month = $(evEle).val().split(linkType)[1]
-                day = $(evEle).val().split(linkType)[2]
+                year = $(evEle).attr('data-sel01');
+                month = $(evEle).attr('data-sel02');
+                day = $(evEle).attr('data-sel03');
                 if(timeBoo){
-                    day = $(evEle).val().split(linkType)[2].split(' ')[0];
-                    hour = $(evEle).val().split(linkType)[2].split(' ')[1].split(':')[0];
-                    minute = $(evEle).val().split(linkType)[2].split(' ')[1].split(':')[1];
+                    hour = $(evEle).attr('data-sel04');
+                    minute = $(evEle).attr('data-sel05');
                 };
             };
             var scText = year; // 年
@@ -361,108 +320,118 @@
             var scText5 = minute; // 分钟
             $('.sel-con').find('.elem').eq(0).find('.ele').each(function(){
                 if($(this).text()==year){
-                    $(this).parents('.scroll').scrollTop($(this).index()*36);
+                    $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                 }
             });
             $('.sel-con').find('.elem').eq(1).find('.ele').each(function(){
                 if($(this).text()==month){
-                    $(this).parents('.scroll').scrollTop($(this).index()*36);
+                    $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                 }
             });
             $('.sel-con').find('.elem').eq(2).find('.ele').each(function(){
                 if($(this).text()==day){
-                    $(this).parents('.scroll').scrollTop($(this).index()*36);
+                    $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                 }
             });
             if(timeBoo){
                 $('.sel-con').find('.elem').eq(3).find('.ele').each(function(){
                     if($(this).text()==hour){
-                        $(this).parents('.scroll').scrollTop($(this).index()*36);
+                        $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                     }
                 });
                 $('.sel-con').find('.elem').eq(4).find('.ele').each(function(){
                     if($(this).text()==minute){
-                        $(this).parents('.scroll').scrollTop($(this).index()*36);
+                        $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                     }
                 });
             };
             $('.sel-con .scroll').eq(0).scroll(function(){
                 var that = $(this);
                 // 数值显示
-                var scTop = $(this).scrollTop()+18;
+                var scTop = $(this)[0].scrollTop+18;
                 var scNum = Math.floor(scTop/36);
                 // 类型名称
                 scText = $(this).find('.ele').eq(scNum).text();
                 // 停止锁定
                 clearTimeout($(this).attr('timer'));
-                $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                $(this).attr('timer',setTimeout(function(){
+                    that[0].scrollTop = scNum*36;
+                },100));
                 $('.sel-con .table').find('.elem').eq(2).remove();
                 $('.sel-con .table').find('.elem').eq(1).after(dataFrame(couDay(getMonthDays(scText,scText2))));
                 // 固定在原来的值
                 $('.sel-con').find('.elem').eq(2).find('.ele').each(function(){
                     if(Number($(this).text())<=Number(scText3)){
-                        $(this).parents('.scroll').scrollTop($(this).index()*36);
+                        $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                     }
                 });
                 $('.sel-con .scroll').eq(2).scroll(function(){
                     var that = $(this);
                     // 数值显示
-                    var scTop = $(this).scrollTop()+18;
+                    var scTop = $(this)[0].scrollTop+18;
                     var scNum = Math.floor(scTop/36);
                     // 类型名称
                     scText3 = $(this).find('.ele').eq(scNum).text();
                     // 停止锁定
                     clearTimeout($(this).attr('timer'));
-                    $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                    $(this).attr('timer',setTimeout(function(){
+                        that[0].scrollTop = scNum*36;
+                    },100));
                 });
             });
             $('.sel-con .scroll').eq(1).scroll(function(){
                 var that = $(this);
                 // 数值显示
-                var scTop = $(this).scrollTop()+18;
+                var scTop = $(this)[0].scrollTop+18;
                 var scNum = Math.floor(scTop/36);
                 // 类型名称
                 scText2 = $(this).find('.ele').eq(scNum).text();
                 // 停止锁定
                 clearTimeout($(this).attr('timer'));
-                $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                $(this).attr('timer',setTimeout(function(){
+                    that[0].scrollTop = scNum*36;
+                },100));
                 $('.sel-con .table').find('.elem').eq(2).remove();
                 $('.sel-con .table').find('.elem').eq(1).after(dataFrame(couDay(getMonthDays(scText,scText2))));
                 // 固定在原来的值
                 $('.sel-con').find('.elem').eq(2).find('.ele').each(function(){
                     if(Number($(this).text())<=Number(scText3)){
-                        $(this).parents('.scroll').scrollTop($(this).index()*36);
+                        $(this).parents('.scroll')[0].scrollTop = $(this).index()*36;
                     };
                 });
                 $('.sel-con .scroll').eq(2).scroll(function(){
                     var that = $(this);
                     // 数值显示
-                    var scTop = $(this).scrollTop()+18;
+                    var scTop = $(this)[0].scrollTop+18;
                     var scNum = Math.floor(scTop/36);
                     // 类型名称
                     scText3 = $(this).find('.ele').eq(scNum).text();
                     // 停止锁定
                     clearTimeout($(this).attr('timer'));
-                    $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                    $(this).attr('timer',setTimeout(function(){
+                        that[0].scrollTop = scNum*36;
+                    },100));
                 });
             });
             $('.sel-con .scroll').eq(2).scroll(function(){
                 var that = $(this);
                 // 数值显示
-                var scTop = $(this).scrollTop()+18;
+                var scTop = $(this)[0].scrollTop+18;
                 var scNum = Math.floor(scTop/36);
                 // 类型名称
                 scText3 = $(this).find('.ele').eq(scNum).text();
                 // 停止锁定
                 clearTimeout($(this).attr('timer'));
-                $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                $(this).attr('timer',setTimeout(function(){
+                    that[0].scrollTop = scNum*36;
+                },100));
             });
             var time = '';
             if(timeBoo){
                 $('.sel-con .scroll').scroll(function(){
                     var that = $(this);
                     // 数值显示
-                    var scTop = $(this).scrollTop()+18;
+                    var scTop = $(this)[0].scrollTop+18;
                     var scNum = Math.floor(scTop/36);
                     // 类型名称
                     if($(this).parents('.elem').index()==3){
@@ -473,7 +442,9 @@
                     time = ' '+scText4+':'+scText5
                     // 停止锁定
                     clearTimeout($(this).attr('timer'));
-                    $(this).attr('timer',setTimeout(function(){that.scrollTop(scNum*36);},100));
+                    $(this).attr('timer',setTimeout(function(){
+                        that[0].scrollTop = scNum*36;
+                    },100));
                 });
             }
 
@@ -481,13 +452,18 @@
             $(".sel-box .ok").off();
             // 进行传值
             $('.sel-box .ok').click(function(){
+                $(evEle).attr('data-sel01', scText);
+                $(evEle).attr('data-sel02', scText2);
+                $(evEle).attr('data-sel03', scText3);
+                $(evEle).attr('data-sel04', scText4);
+                $(evEle).attr('data-sel05', scText5);
                 afterAction(scText,scText2,scText3,scText4,scText5);
 
                 $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
                 setTimeout(function(){
                   $('.sel-boxs').hide();
                 },300);
-                $('body').css('overflow','auto');
+                
                 $('.sel-boxs .bg')[0].removeEventListener('touchmove', preDef, false);
                 $('.sel-boxs .btn')[0].removeEventListener('touchmove', preDef, false);
             });

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" style="font-size: 75px" data-dpr="2">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=0.5,user-scalable=no">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
   <title>选择器</title>
 </head>
 <style>
@@ -32,15 +32,15 @@
     <input style="border:solid 1px red;" class="qu-time" type="text">
   </div>
   <div style="margin-top:10px;">
-    <span style="padding-right:10px;">年月日+时间</span>
-    <input style="border:solid 1px red;margin-top:10px" class="sp-date" type="text">
-  </div>
-  <div style="margin-top:10px;">
     <span style="padding-right:10px;">年月日</span>
     <input style="border:solid 1px red;margin-top:10px" class="sp-time" type="text">
   </div>
+  <div style="margin-top:10px;">
+    <span style="padding-right:10px;">年月日+时间</span>
+    <input style="border:solid 1px red;margin-top:10px" class="sp-date" type="text">
+  </div>
   <script src="js/jq.js"></script>
-  <script src="js/jquery.selector-rem.js"></script>
+  <script src="js/jquery.selector-px.js"></script>
   <script>
     $(function () {
       // ---------【数据部分开始】---------
@@ -89,7 +89,7 @@
 
       //体重
       $.scrEvent2({
-        data1: quWeightInt,
+        data: quWeightInt,
         data2: quWeightFl,
         evEle: '.qu-weight',
         title: '体重/kg',
@@ -105,7 +105,7 @@
 
       //睡眠
       $.scrEvent2({
-        data1: spoHour,
+        data: spoHour,
         data2: spoMinute,
         evEle: '.qu-time',
         title: '睡眠时长',
@@ -113,29 +113,18 @@
         defValue2: 0,
         eleName: '小时',
         eleName2: '分钟',
-        linkType: ':',
         afterAction: function (data1, data2) {
-          $('.qu-time').attr('h', data1);
-          $('.qu-time').attr('m', data2);
           $('.qu-time').val(data1 + '小时' + data2 + '分钟');
-        },
-        beforeVal1: function () {
-          return $('.qu-time').attr('h');
-        },
-        beforeVal2: function () {
-          return $('.qu-time').attr('m');
         }
       })
 
       // 年月日 时分
       $.dateSelector({
         evEle: '.sp-date',
-        linkType: '-',
         year: 1990,
         month: 12,
         day: 08,
-        linkType: '-',
-        startYear: '2017',
+        startYear: '1990',
         endYear: '2017',
         timeBoo: true,
         afterAction: function (d1, d2, d3, d4, d5) {
@@ -145,18 +134,15 @@
 
       // 年月日
       $.dateSelector({
-        evEle: '.sp-time',
-        linkType: '-',
-        startYear: '2017',
-        endYear: '2017',
-        timeBoo: false,
-        afterAction: function (d1, d2, d3) {
-          console.log(d1, d2, d3)
-
-          alert('你选择的是：' + d1 + '-' + d2 + '-' + d3);
-        }
+          evEle: '.sp-time',
+          startYear: '2017',
+          endYear: '2022',
+          timeBoo: false,
+          afterAction: function (d1, d2, d3) {
+            $('.sp-time').val(d1 + '-' + d2 + '-' + d3);
+          }
       });
-    });
+});
   </script>
 </body>
 

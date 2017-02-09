@@ -75,11 +75,6 @@
     // 封装说明：
     // 基于jQuery
     // 适合场景，只适用于单个值的选取模式
-    // scrEvent(ele,evEle,selName,defValue)
-    // 1.参数【ele】是选择器取值范围，类型为数组
-    // 2.参数【evEle】是要绑定元素的元素名称，如：class、id、element...
-    // 3.参数【selName】是选择器名称
-    // 4.参数【defValue】是选择器默认值【可选】
     $.scrEvent = function(params){
 
         var dataArr = params.data || [];
@@ -155,17 +150,7 @@
 
     // 封装说明：
     // 基于jQuery
-    // 适合场景，只适用于两个值的选取模式
-    // scrEvent2(ele,evEle,selName,defValue,ele2)
-    // 1.参数【ele】是选择器取值范围，类型为数组
-    // 2.参数【evEle】是要绑定元素的元素名称，如：class、id、element...  【必须】
-    // 3.参数【selName】是选择器名称
-    // 4.参数【defValue】是选择器第一个取值默认值【可选】
-    // 5.参数【ele2】是选择器取值范围第二个值，类型为数组
-    // 6.参数【defValue2】是选择器第二个取值默认值【可选】
-    // 7.参数【linkType】是第一个值和第二个值中间链接符号
-    // 8.参数【eleName】是选择器第一个值的名称【可选】
-    // 9.参数【eleName2】是选择器第二个值的名称【可选】
+    // 适合场景，只适用于两个值（可带单位）的选取模式
     $.scrEvent2 = function(params){
 
         var ele = params.data1 || [];
@@ -267,6 +252,13 @@
         });
     };
 
+   
+
+    // 选择器
+    // 封装说明：
+    // 基于jQuery
+    // 适合场景，适用于年 月 日选择    也可以小时和分钟
+    
     // 每个月的天数
     function getMonthDays(year,month){
         return new Date(year,month,0).getDate();
@@ -283,19 +275,7 @@
         };
         return arrDay;
     };
-
-    // 选择器
-    // 封装说明：
-    // 基于jQuery
-    // 适合场景，适用于年 月 日选择
-    // dateSelector(evEle,year,month,day)
-    // 1.参数【evEle】是要绑定元素的元素名称，如：class、id、element...
-    // 2.参数【year】默认显示年，没有需设置为空
-    // 3.参数【month】默认显示月，没有需设置为空
-    // 4.参数【day】默认显示日，没有需设置为空
-    // 5.参数【timeBoo】true:使用年月日+时间 false:使用年月日
-    // 6.参数【hour】默认显示小时
-    // 7.参数【minute】默认显示分钟
+    
     $.dateSelector = function(params){
         var hunYear = [];
         var evEle = params.evEle || evEle;
