@@ -170,13 +170,14 @@
 
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
-
+            beforeAction();
             $('.sel-con .table').html(dataFrame(ele)+eleName+dataFrame(ele2)+eleName2);
             $('.sel-box .name').text(selName);
             $('.sel-boxs').show().find('.sel-box').removeClass('fadeInDown').addClass('fadeInUp');
 
             // 第一个值默认值
             $(evEle).val()==""?defValue = defValue:defValue= $(evEle).attr('data-sel01');
+            // 第二个值默认值
             $(evEle).val()==""?defValue2 = defValue2:defValue2=$(evEle).attr('data-sel02');
 
             $('.sel-con').find('.elem').eq(0).find('.ele').each(function(){
@@ -265,8 +266,8 @@
         var hour = params.hour || new Date().getHours();
         var minute = params.minute || new Date().getMinutes();
         var title = params.title || '日期选择';
-        //执行后的动作   参数：选择的文字
-        var afterAction = params.afterAction || function (){};
+        var beforeAction = params.beforeAction || function(){}; //执行前的动作  无参数                
+        var afterAction = params.afterAction || function (){};//执行后的动作   参数：选择的文字
 
         // 年 默认范围：当前年份-10 ~ 当前年份 ~ 当前年份+10
         if (startYear !== '' && endYear !== '') {
@@ -295,7 +296,7 @@
 
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
-
+            beforeAction();
             var timeGroup = '';
             if(timeBoo){
                 timeGroup=dataFrame(timeHour)+dataFrame(timeMinute);

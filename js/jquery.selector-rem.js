@@ -82,11 +82,8 @@
         var title = params.title || '';
         var defValue = params.defValue || dataArr[0]; //首次默认值
         var type = params.type || 'click'; //事件类型
-        var beforeVal = params.beforeVal || function (){  //每次默认值
-        }
-
-        //执行后的动作   参数：选择的文字
-        var afterAction = params.afterAction || function (){};
+        var beforeAction = params.beforeAction || function(){};//执行前的动作  无参数 
+        var afterAction = params.afterAction || function (){};//执行后的动作   参数：选择的文字
 
         $(evEle).attr('readonly','readonly');
         // 点击对应input执行事件
@@ -98,16 +95,12 @@
             });
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
-
+            beforeAction();
             $('.sel-con .table').html(dataFrame(dataArr));
             $('.sel-box .name').text(title);
             $('.sel-boxs').show().find('.sel-box').removeClass('fadeInDown').addClass('fadeInUp');
             // 默认值
-            if (!beforeVal()) {
-                $(evEle).val() == "" ? defValue = defValue : defValue = $(evEle).val();
-            }else{
-                defValue = beforeVal();
-            }
+            $(evEle).val() == "" ? defValue = defValue : defValue = $(evEle).attr('data-sel01');
 
             $('.sel-con').find('.elem').eq(0).find('.ele').each(function(){
                 if($(this).text() == defValue){
@@ -134,8 +127,8 @@
             $(".sel-box .ok").off();
             // 确认选择
             $('.sel-box .ok').click(function(){
+                $(evEle).attr('data-sel01', scText);
                 afterAction(scText);
-
                 $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
                 setTimeout(function(){
                   $('.sel-boxs').hide();
@@ -163,16 +156,8 @@
         var type = params.type || 'click'; //事件类型
         var eleName = params.eleName || '';  //第一个值的单位
         var eleName2 = params.eleName2 || '';  //第二个值的单位
-        var linkType = params.linkType || ''; //分隔符
-
-        var beforeVal1 = params.beforeVal1 || function (){  //每次默认值
-        }
-
-        var beforeVal2 = params.beforeVal2 || function (){  //每次默认值
-        }
-
-        //执行后的动作   参数1：选择的文字1； 参数2 选择的文字2 
-        var afterAction = params.afterAction || function (){};
+        var beforeAction = params.beforeAction || function(){}; //执行前的动作  无参数
+        var afterAction = params.afterAction || function (){}; //执行后的动作   参数1：选择的文字1； 参数2 选择的文字2 
 
         $(evEle).attr('readonly','readonly');
         eleName!=''?eleName = '<div class="cell" style="font-size:' + 14/fontSize + 'rem;color:#b2b2b2;">'+eleName+'</div>':eleName = '';
@@ -187,23 +172,16 @@
 
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
-
+            beforeAction();
             $('.sel-con .table').html(dataFrame(ele)+eleName+dataFrame(ele2)+eleName2);
             $('.sel-box .name').text(selName);
             $('.sel-boxs').show().find('.sel-box').removeClass('fadeInDown').addClass('fadeInUp');
 
             // 第一个值默认值
-            if (!beforeVal1()) {
-                $(evEle).val()==""?defValue = defValue:defValue=$(evEle).val().split(linkType)[0];
-            }else{
-                 defValue = beforeVal1();
-            }
-
-            if (!beforeVal2()) {
-                $(evEle).val()==""?defValue2 = defValue2:defValue2=$(evEle).val().split(linkType)[1];
-            }else{
-                defValue2 = beforeVal2();
-            }
+            $(evEle).val()==""?defValue = defValue:defValue= $(evEle).attr('data-sel01');
+            // 第二个值默认值
+            $(evEle).val()==""?defValue2 = defValue2:defValue2=$(evEle).attr('data-sel02');
+    
 
             $('.sel-con').find('.elem').eq(0).find('.ele').each(function(){
                 if($(this).text()==defValue){
@@ -240,6 +218,8 @@
             $(".sel-box .ok").off();
             // 确认选择
             $('.sel-box .ok').click(function(){
+                $(evEle).attr('data-sel01', scText);
+                $(evEle).attr('data-sel02', scText2);
                 afterAction(scText, scText2);
                 $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
                 setTimeout(function(){
@@ -275,7 +255,7 @@
         };
         return arrDay;
     };
-    
+
     $.dateSelector = function(params){
         var hunYear = [];
         var evEle = params.evEle || evEle;
@@ -283,14 +263,14 @@
         var month = params.month || new Date().getMonth() + 1;
         var day = params.day || new Date().getDate();
         var type = params.type || 'click'; //事件类型
-        var linkType = params.linkType || '-';
         var startYear = params.startYear || '';
         var endYear = params.endYear || '';
         var timeBoo = params.timeBoo || false;
         var hour = params.hour || new Date().getHours();
         var minute = params.minute || new Date().getMinutes();
-        //执行后的动作   参数：选择的文字
-        var afterAction = params.afterAction || function (){};
+        var title = params.title || '日期选择';
+        var beforeAction = params.beforeAction || function(){}; //执行前的动作  无参数   
+        var afterAction = params.afterAction || function (){};//执行后的动作   参数：选择的文字
 
         // 年 默认范围：当前年份-10 ~ 当前年份 ~ 当前年份+10
         if (startYear !== '' && endYear !== '') {
@@ -319,7 +299,7 @@
 
             $('.sel-boxs .bg')[0].addEventListener('touchmove', preDef, false);
             $('.sel-boxs .btn')[0].addEventListener('touchmove', preDef, false);
-
+             beforeAction();
             var timeGroup = '';
             if(timeBoo){
                 timeGroup=dataFrame(timeHour)+dataFrame(timeMinute);
@@ -329,13 +309,12 @@
             $('.sel-boxs').show().find('.sel-box').removeClass('fadeInDown').addClass('fadeInUp');
             // 选择器
             if($(evEle).val()!=''){
-                year = $(evEle).val().split(linkType)[0]
-                month = $(evEle).val().split(linkType)[1]
-                day = $(evEle).val().split(linkType)[2]
+                year = $(evEle).attr('data-sel01');
+                month = $(evEle).attr('data-sel02');
+                day = $(evEle).attr('data-sel03');
                 if(timeBoo){
-                    day = $(evEle).val().split(linkType)[2].split(' ')[0];
-                    hour = $(evEle).val().split(linkType)[2].split(' ')[1].split(':')[0];
-                    minute = $(evEle).val().split(linkType)[2].split(' ')[1].split(':')[1];
+                    hour = $(evEle).attr('data-sel04');
+                    minute = $(evEle).attr('data-sel05');
                 };
             };
             var scText = year; // 年
@@ -477,6 +456,11 @@
             $(".sel-box .ok").off();
             // 进行传值
             $('.sel-box .ok').click(function(){
+                $(evEle).attr('data-sel01', scText);
+                $(evEle).attr('data-sel02', scText2);
+                $(evEle).attr('data-sel03', scText3);
+                $(evEle).attr('data-sel04', scText4);
+                $(evEle).attr('data-sel05', scText5);
                 afterAction(scText,scText2,scText3,scText4,scText5);
 
                 $('.sel-boxs').find('.sel-box').removeClass('fadeInUp').addClass('fadeInDown');
